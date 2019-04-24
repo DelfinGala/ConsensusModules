@@ -1,0 +1,106 @@
+library(MODifieRDev)
+library(S2B)
+
+#Define function for writing module to output file
+write_module_list <- function(current_module, output_file){
+for (i in 1:length(current_module)){
+invisible(write.table(x = t(c(names(current_module)[[i]], "", current_module[[i]]$module_genes)),
+file = output_file, append = T, row.names = F,
+col.names = F, sep = "\t", quote = F))
+}
+}
+
+#Read in .rds file
+asthma_sputum <- readRDS("./GSE76262_asthma_sputum_SA.rds")
+arthritis_RA <- readRDS("./GSE4588_RA_B_arthritis.rds")
+
+#Read in ppi network
+ppi_network <- read.table("./v_7_1_entrez_700.csv", header = T, sep = ",", colClasses = "character")
+
+#Run WGCNA
+wgcna_module <- wgcna(MODifieR_input = asthma_sputum)
+wgcna_module <- wgcna(MODifieR_input = arthritis_RA)
+saveRDS(wgcna_module, "wgcna_asthma.rds")
+write_module_list(current_module = list("wgcna" = wgcna_module),
+output_file = "./wgcna_asthma_out.txt")
+
+#Run MCODE
+mcode_module <- mod_mcode(MODifieR_input = asthma_sputum,ppi_network = ppi_network)
+mcode_module <- mod_mcode(MODifieR_input = arthritis_RA, ppi_network = ppi_network)
+saveRDS(mcode_module, "mcode_asthma.rds")
+write_module_list(current_module = mcode_module,
+output_file = "./mcode_asthma_out.txt")
+
+#Run DIAMOnD
+diamond_module <- diamond(MODifieR_input = asthma_sputum, ppi_network = ppi_network)
+diamond_module <- diamond(MODifieR_input = arthritis_RA, ppi_network = ppi_network)
+saveRDS(wgcna_module, "diamond_asthma.rds")
+write_module_list(current_module = list("diamond" = diamond_module),
+output_file = "./diamond_asthma_out.txt")
+
+#Prepare S2B inputs
+geneset1 <- wgcna_module$module_genes
+geneset2 <- mcode_module[[1]]$module_genes
+geneset3 <- diamond_module$module_genes
+
+graphed_network <- igraph::graph.data.frame(d = ppi_network)
+simped <- S2B::simpmain(graphed_network)
+
+set1_ind <- S2B::seedrows(seed_graph = simped, seedvec = geneset1)
+set2_ind <- S2B::seedrows(seed_graph = simped, seedvec = geneset2)
+set3_ind <- S2B::seedrows(seed_graph = simped, seedvec = geneset3)
+
+#Run S2B for WGCNA/MCODE
+s2b_wgcna_mcode <- S2B::S2B(seed_graph = simped, index1 = set1_ind, index2 = set2_ind, nrep = 1, nrep2 = 1)
+saveRDS(s2b_wgcna_mcode, "s2b_wgcna_mcode_asthma.rds")
+write.table(s2b_wgcna_mcode$s2btable$id,
+file = "./s2b_wgcna_mcode_asthma_out.txt", append = T, row.names = F, col.names = F, sep = "\t", quote = F)
+
+#Run S2B for WGCNA/DIAMOnD
+s2b_wgcna_diamond <- S2B::S2B(seed_graph = simped, index1 = set1_ind, index2 = set3_ind, nrep = 1, nrep2 = 1)
+saveRDS(s2b_wgcna_diamond, "s2b_wgcna_diamond_asthma.rds")
+write.table(s2b_wgcna_diamond$s2btable$id,
+file = "./s2b_wgcna_diamond_asthma_out.txt", append = T, row.names = F, col.names = F, sep = "\t", quote = F)
+
+#Run S2B for MCODE/DIAMOnD
+s2b_mcode_diamond <- S2B::S2B(seed_graph = simped, index1 = set2_ind, index2 = set3_ind, nrep = 1, nrep2 = 1)
+saveRDS(s2b_mcode_diamond, "s2b_mcode_diamond_asthma.rds")
+write.table(s2b_mcode_diamond$s2btable$id,
+file = "./s2b_mcode_diamond_asthma_out.txt", append = T, row.names = F, col.names = F, sep = "\t", quote = F)
+
+geneset4 <- s2b_wgcna_mcode$s2btable$id
+geneset5 <- s2b_wgcna_diamond$s2btable$id
+geneset6 <- s2b_mcode_diamond$s2btable$id
+
+set4_ind <- S2B::seedrows(seed_graph = simped, seedvec = geneset4)
+set5_ind <- S2B::seedrows(seed_graph = simped, seedvec = geneset5)
+set6_ind <- S2B::seedrows(seed_graph = simped, seedvec = geneset6)
+
+#Run S2B for WGCNA/MCODE + DIAMOnD
+s2b_wgcna_mcode_diamond <- S2B::S2B(seed_graph = simped, index1 = set4_ind, index2 = set3_ind, nrep = 1, nrep2 = 1)
+saveRDS(s2b_wgcna_mcode_diamond, "s2b_wgcna_mcode_diamond_asthma.rds")
+s2b_wgcna_mcode_diamond_asthma <- subset(x = s2b_wgcna_mcode_diamond$s2btable, S2B > 0.002365931,
+select = c(S2B, id))
+write.table(s2b_wgcna_mcode_diamond_arthritis2$id,
+file = "./s2b_wgcna_mcode_diamond_asthma_out.txt", append = T, row.names = F, col.names = F, sep = "\t", quote = F)
+
+#Run S2B for WGCNA/DIAMOnD + MCODE
+s2b_wgcna_diamond_mcode <- S2B::S2B(seed_graph = simped, index1 = set5_ind, index2 = set2_ind, nrep = 1, nrep2 = 1)
+saveRDS(s2b_wgcna_diamond_mcode, "s2b_wgcna_diamond_mcode_asthma.rds")
+s2b_wgcna_diamond_mcode_asthma <- subset(x = s2b_wgcna_diamond_mcode$s2btable, S2B > 0.002365931, select = c(S2B, id))
+write.table(s2b_wgcna_diamond_mcode_asthma$id,
+file = "./s2b_wgcna_diamond_mcode_asthma_out.txt", append = T, row.names = F, col.names = F, sep = "\t", quote = F)
+
+#Run S2B for MCODE/DIAMOnD + WGCNA
+s2b_mcode_diamond_wgcna <- S2B::S2B(seed_graph = simped, index1 = set6_ind, index2 = set1_ind, nrep = 1, nrep2 = 1)
+saveRDS(s2b_mcode_diamond_wgcna, "s2b_mcode_diamond_wgcna_asthma.rds")
+s2b_mcode_diamond_wgcna_asthma <- subset(x = s2b_mcode_diamond_wgcna$s2btable, S2B > 0.002365931, select = c(S2B, id))
+write.table(s2b_mcode_diamond_wgcna_asthma$id,
+file = "./s2b_mcode_diamond_wgcna_asthma_out.txt", append = T, row.names = F, col.names = F, sep = "\t", quote = F)
+
+#Subset S2B object for values greater than 0.002365931
+s2b_wgcna_mcode_asthma <- subset(x = s2b_wgcna_mcode$s2btable, S2B > 0.002365931, select = c(S2B, id))
+write.table(x = s2b_wgcna_mcode_asthma$id, row.names = FALSE, col.names = FALSE, sep = "\t", quote = FALSE, file = "s2b_wgcna_mcode_asthma_out.txt")
+
+s2b_wgcna_diamond_asthma <- subset(x = s2b_wgcna_diamond$s2btable, S2B > 0.002365931, select = c(S2B, id))
+write.table(x = s2b_wgcna_diamond_asthma$id, row.names = FALSE, col.names = FALSE, sep = "\t", quote = FALSE, file = s2b_wgcna_diamond_asthma_out.txt")

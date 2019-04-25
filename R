@@ -7,7 +7,7 @@ for (i in 1:length(current_module)){
 invisible(write.table(x = t(c(names(current_module)[[i]], "", current_module[[i]]$module_genes)),
 file = output_file, append = T, row.names = F,
 col.names = F, sep = "\t", quote = F))
-}
+  }
 }
 
 #Read in .rds file

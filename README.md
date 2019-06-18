@@ -15,13 +15,19 @@ Summarized here is the method’s general order:
 Initially, MCODE and DIAMOnD are used to establish a data-processing pipeline. Consensus modules are created by identifying subgraphs of overlapping nodes. This process is then repeated using MCODE and DIAMOnD modules as inputs for S2B. Garcia et al. compared pairs of modules, but in this study combinations of both two- and three-inference modules are derived.
 
 An RDS object (e.g., GSE76262_asthma_sputum_SA.rds) is loaded into the R environment. The object contains a data frame with the following:
+
 •	diff_genes: a data frame of lists, including genes (Entrez IDs), p-values, an annotated expression matrix, and a list of DIAMOnD genes
+
 •	annotation_table: a data frame of lists, including probe IDs, probe symbols, and Entrez IDs
+
 •	group_indicii: an index of controls and patients
 
 Both MCODE and DIAMOnD require loading of a protein-protein interaction (PPI) network in addition to an RDS object. The PPI is a comma-separated (.csv) file that contains the following:
+
 •	entrez1: a list of Entrez identifiers for the network (connections to entrez2)
+
 •	entrez2: a list of Entrez identifiers for the network (connections to entrez1)
+
 •	SCORE: a weighted score of each connection (value range: 700–1,000)
 
 The output from each method is a disease module that contains a data frame of lists, including “module_genes”, which are the significant genes identified by each method. Lists of genes from each module are then written to a text file, which is later evaluated for enrichment of GWAS SNPs using Pascal. The module gene lists serve as inputs for S2B in the next step.
@@ -46,5 +52,4 @@ Modules outputted to S2B are recombined with stand-alone modules using three per
 2.	MCODE/WGCNA + DIAMOnD
 3.	WGCNA/DIAMOnD + MCODE
 
-Validation
 Upon validation with Pascal, the program delivers a single “meta p-value” for each module.

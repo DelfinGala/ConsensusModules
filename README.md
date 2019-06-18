@@ -1,11 +1,9 @@
 # ConsensusModules
 # Comparing consensus modules using S2B and MODifieR
 
-Overview
 Modules are inferred from stand-alone methods (DIAMOnD, MCODE, WGCNA) and serve as inputs for S2B, which is used to create additional consensus modules for comparison. The R package for S2B is available from frpinto/S2B, MODifieR is available from ddeweerd/MODifieRDev, and there are testable datasets available from OMIM (omim.org).
 
-Validation
-Validation is inherently difficult in this work because disease modules are largely incomplete today, so there is no universally accepted standard to adopt. This is particularly problematic because measures of sensitivity and specificity cannot be derived. In the absence of an ideal standard, benchmark validation for this study was carried out using Pascal. Pascal is available from https://www2.unil.ch/cbg/index.php?title=Pascal
+Validation of these methods is inherently difficult in this work because disease modules are largely incomplete today, so there is no universally accepted standard to adopt. This is particularly problematic because measures of sensitivity and specificity cannot be derived. In the absence of an ideal standard, benchmark validation for this study was carried out using Pascal, which is available from https://www2.unil.ch/cbg/index.php?title=Pascal
 
 Summarized here is the method’s general order:
 1.	Create a consensus module using three methods: clique-based (MCODE), seed-based (DIAMOnD), and hierarchical (WGCNA).

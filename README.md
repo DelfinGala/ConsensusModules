@@ -21,7 +21,9 @@ An RDS object (e.g., GSE76262_asthma_sputum_SA.rds) is loaded into the R environ
 Both MCODE and DIAMOnD require loading of a protein-protein interaction (PPI) network in addition to an RDS object. The PPI is a comma-separated (.csv) file that contains the following:
 
   •	entrez1: a list of Entrez identifiers for the network (connections to entrez2)
+
   •	entrez2: a list of Entrez identifiers for the network (connections to entrez1)
+
   •	SCORE: a weighted score of each connection (value range: 700–1,000)
 
 The output from each method is a disease module that contains a data frame of lists, including “module_genes”, which are the significant genes identified by each method. Lists of genes from each module are then written to a text file, which is later evaluated for enrichment of GWAS SNPs using Pascal. The module gene lists serve as inputs for S2B in the next step.

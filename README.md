@@ -16,8 +16,8 @@ Initially, MCODE and DIAMOnD are used to establish a data-processing pipeline. C
 An RDS object (e.g., GSE76262_asthma_sputum_SA.rds) is loaded into the R environment. The object contains a data frame with the following:
 
     • diff_genes: a data frame of lists, including genes (Entrez IDs), p-values, an annotated expression matrix, and a list of DIAMOnD genes
-    •	annotation_table: a data frame of lists, including probe IDs, probe symbols, and Entrez IDs
-    •	group_indicii: an index of controls and patients
+    • annotation_table: a data frame of lists, including probe IDs, probe symbols, and Entrez IDs
+    • group_indicii: an index of controls and patients
 
 Both MCODE and DIAMOnD require loading of a protein-protein interaction (PPI) network in addition to an RDS object. The PPI is a comma-separated (.csv) file that contains the following:
 

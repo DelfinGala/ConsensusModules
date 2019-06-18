@@ -1,4 +1,3 @@
-# ConsensusModules
 # Comparing consensus modules using S2B and MODifieR
 
 Modules are inferred from stand-alone methods (DIAMOnD, MCODE, WGCNA) and serve as inputs for S2B, which is used to create additional consensus modules for comparison. The R package for S2B is available from frpinto/S2B, MODifieR is available from ddeweerd/MODifieRDev, and there are testable datasets available from OMIM (omim.org).
